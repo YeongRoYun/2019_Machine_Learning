@@ -1,0 +1,623 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{kotex}
+\usepackage{mathtools}
+
+\title{Model Part}
+\author{2018320135 윤영로}
+\date{2019.12.08}
+
+\begin{document}
+
+\maketitle
+
+\section{Model}
+\subsection{Preknowledge}
+\begin{itemize}
+    \item[1.] First Order necessary Condition(FONC) : \newline
+    $f(x)$ = local minimum $\implies\frac{\mathrm d}{\mathrm d x} \left( f(x) \right)=0$
+    \item[2.] Convex Set : $\forall v,w \in Set, (t*v + s*w) \subseteq Set$,   \textbf{(such that. $t+s = 1$)}
+    \item[3.] Epi-Graph : $S = \{y | y >= f(x)\}$
+    \item[3.] Convex function : Epi-Graph is convex set.
+    \item[4.] Convex Properties :
+        \begin{itemize}
+            \item $x^T \cdot Hessian \cdot x \succeq 0$,\textbf{(such that, $x\geq0$)}
+            \item $f(x)$ has global minimum $\iff$ $\frac{\mathrm d}{\mathrm d x} \left( f(x) \right)=0$
+            \item A Concatenation of convex functions make convex functions.
+            \item Sub derivative : \newline If $f(x)$ is convex function, then the only not derivative point of $f(x)$ is global minimum.
+                                  And the derivative of this point($x^*$) can be anything 
+                                  where $ value \in (\lim\limits_{x \to x^*-}f(x), \lim\limits_{x \to x^*+}f(x))$
+        \end{itemize}
+    \item[5.] Convex Optimization : 
+        \begin{itemize}
+            \item \textbf{expression} : $argmin_x f(x)$,\textbf{(where, $Ax\leq b$)}
+            \item \textbf{f(x)} : convex function
+            \item \textbf{constraint} : convex set
+        \end{itemize}
+    \item[6.] Gradient Descent(Momentum Method) :
+        \begin{itemize}
+            \item \textbf{정의} : 이전 갱신을 현재 갱신에 반영하여 Loss 값이 빠르게 감소하도록 w를 찾는 방법
+            \item \textbf{Implementation} : 
+                \begin{itemize}
+                    \item[1.] Find unit gradient ($g = G/\|G\|$)
+                    \item[2.] Set direction for decreasing a gradient ($p = -g$)
+                    \item[3.] update next weight \newline
+                            ${w}^{i+1} = {w}^{i} + step*direction + gravity*({w}^{i} - {w}^{i-1})$
+                    \item[4.] If the size of gradient converge on 0, then this algorithm terminates.
+                    \item[5.] otherwise, repeat this until loop<max iter.
+                \end{itemize}
+        \end{itemize}
+    
+    \item[7.] Gaussian Distribution(Normal Distribution) : 
+        \begin{itemize}
+            \item \textbf{Definition} : $N(x|\mu, {\sigma}^2) = \frac{1}{\sigma\sqrt{2\pi}}exp(-\frac{(x-\mu)^2}{2{\sigma}^2})$
+            \item \textbf{mean, median, mode} : $\mu$
+            \item \textbf{variance} : ${\sigma}^2$
+            \item \textbf{Characteristic} :
+                \begin{itemize}
+                    \item [A.] $\mu$를 기준으로 대칭이다.
+                    \item [B.] $\mu$에서 Likelyhood가 최대가 된다.
+                    \item [C.] $mean, median, mode = \mu$이다.
+                    \item [D.] $Domain \in (-\infty, +\infty)$일 때, 여러 Discrete Distribution은 Gaussian에 근접한다.
+                    \item [E.]  $-N(x|\mu, \sigma^2)$ is convex because an Epi-Graph of this is convex set.
+                \end{itemize}
+        \end{itemize}
+    \item[8.] Laplace Distribution
+        \begin{itemize}
+            \item \textbf{Definition} : $Laplace(\mu,b) = P(y|\mu, b) = \frac{1}{2b}exp(-\frac{|x-\mu|}{b})$
+            \item \textbf{mean, median, mode} : $\mu$
+            \item \textbf{variance} : $2b^2$ 
+            \item \textbf{Characteristic}
+                \begin{itemize}
+                    \item [A.] $\mu$를 기준으로 대칭이다.
+                    \item [B.] $\mu$에서 Likelyhood가 최대가 된다.
+                    \item [C.] $mean, median, mode = \mu$이다.
+                    \item [D.] $\mu$에서 미분 불가능 하다.
+                    \item [E.] $-Laplace(\mu, b)$ is convex because an Epi-Graph of this is convex set.
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+\subsection{Linear Regression}
+
+\subsubsection{Definition}
+\begin{itemize}
+    \item[a] \textbf{초평면} : N차원 공간을 분할하는 (N-1)차원의 평면  
+    \item[b] \textbf{Linear Regression} : 
+        \begin{itemize}
+            \item features와 targets으로 이루어진 공간에서, targets을 예측하는 초평면을 찾는 모델
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Expression}
+\begin{itemize}
+    \item[1.] \textbf{expression} : $\boldsymbol{y = Xw+b}$
+    
+    \item[2.] \textbf{symbol} 
+    \begin{itemize}
+        \item $\boldsymbol{X_{m,n}} = 
+                \begin{pmatrix}
+                x_{1,1} & x_{1,2} & \cdots & x_{1,n} \\
+                x_{2,1} & x_{2,2} & \cdots & x_{2,n} \\
+                \vdots  & \vdots  & \ddots & \vdots  \\
+                x_{m,1} & x_{m,2} & \cdots & x_{m,n}
+                \end{pmatrix}$ : feature matrix
+                
+        \item $\boldsymbol{y} = (\y_1,\y_2,\dots,\y_n)$ : target vector (예측해야 하는 값)
+        \item $\boldsymbol{w} = (\w_1,\w_2,\dots,\w_n)$ : weight vector (feature의 중요도)
+        \item $\boldsymbol{b} = (\b_1,\b_2,\dots,\b_n)$ : bias vector (초평면의 위치)
+    \end{itemize}
+    
+    \item[3.] \textbf{loss function}
+    \begin{itemize}
+        \item \textbf{Residual Sum of Squares} : 
+            \begin{itemize}
+                \item \textbf{Definition} : $RSS(w) := \sum_{i=1}^{m} (y_i - (X_iw+b_i))$
+                \item \textbf{Matrix Form} : $RSS(w) := (y-(Xw+b))^2$
+            \end{itemize}
+        \item \textbf{expression} : $L(w) = RSS(w)$
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Properties}
+\begin{itemize}
+    \item [1.] Space의 basis를 변주하여 $P_n(R)$의 vector 또한 관측할 수 있다.
+    \item [2.] Convex Optimization Program.
+    \item[3.] parameteric model이므로, weight를 계산해야 한다.
+    \item[4.] non-parameteric model과 비교했을 때, fitting에는 시간이 더 소요되지만, 빠른 예측이 가능하다.(후에 모델 비교로 이동)
+\end{itemize}
+
+\subsubsection{Optimization}
+\begin{itemize}
+    \item \textbf{goal} : Find $argmin_w L(w)$
+    \item \textbf{Perspective of Probability} : 
+         \begin{itemize}
+             \item \textbf{expression} : $argmax_w P(y|X,w)$
+             \item \textbf{Likelyhood Probability} : $P(y|X,w)$ $\sim N(y|\mu, {\sigma}^{2})$
+         \end{itemize}
+    \item \textbf{Properties} : 
+    \begin{itemize}
+        \item Convex Optimization.
+        \item This program has a global minimum at $\frac{\mathrm d}{\mathrm d x} \left( f(x) \right)=0$
+    \end{itemize}
+    \item \textbf{search method}
+    \begin{itemize}
+        \item[1.] $M = (X^tX)$가 가역행렬이라는 가정 하에, Optimal Solution을 직접 구할 수 있다.
+        \begin{itemize}
+            \item[--] $w^* = M^{-1}X^{t}y = X^{-1}y$
+        \end{itemize}
+        
+        \item[2.] Gradient Descent
+        \begin{itemize}
+            \item \textbf{gradient} : $-2X^t(y-Xw)$
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Implementation} : 
+        \begin{itemize}
+            \item[Method] : Find Optimal Solution directly
+            \item[Algorithm] : $w^* = Optimal$
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Prediction}
+\begin{itemize}
+    \item[Algorithm] : Return $<weight, data>$ 
+\end{itemize}
+
+\subsection{Ridge Regression}
+\subsubsection{Definition}
+\begin{itemize}
+    \item[a] \textbf{L2 regularization} : 
+    \begin{itemize}
+        \item Definition : L2 norm($\|x\|$)을 이용한 제약
+        \item Expression : $argmin_w {f(x) +\lambda{ \| w \|}^2}$
+        \item Perspective of Probability :
+        \begin{itemize}
+            \item[1.] \textbf{base1} : Weight에 대한 Gaussian prior를 도입($P(w|0,\sigma^2) \sim N(w|0,\sigma^2)$)
+            \item[2.] \textbf{base2} : Weight에 대한 Posterior ($P(w|X,y) \sim P(y|X,w)P(w|0,\sigma^2$)를 이용한다.
+            \item[3.] \textbf{expression} : $argmax_w P(w|X,y)$
+        \end{itemize}
+    \end{itemize}
+    \item[b] \textbf{Ridge Regression} : 
+        \begin{itemize}
+            \item L2 Regularization을 통해, 학습 데이터에  과적합 되지 않도록 만든 Linear Regression
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Expression}
+\begin{itemize}
+    \item[1.] \textbf{expression} : $\boldsymbol{y = Xw+b}$
+    \item[2.] \textbf{loss function} : $L(w) = RSS(w) + \lambda{\|w\|}^2$
+\end{itemize}
+
+\subsubsection{Properties}
+\begin{itemize}
+    \item [1.] Convex Optimization Program.
+    \item [2.] Degree of L2 regularization($\lambda$) $\propto$ Simplest of Model
+        \begin{itemize}
+            \item[a.] The hypothesis of weight can prevent model from over fitting about training data sets.
+            \item[b.] Too strong the hypothesis of weight can cause under fitting.
+        \end{itemize}
+    \item[3.] Weight Decay : Weight가 Gaussian distribution을 가정이 the entries of weight가 널뛰는 것을 막는다.
+\end{itemize}
+
+\subsubsection{Optimization}
+\begin{itemize}
+    \item \textbf{goal} : Find $argmin_w RSS(w) + \lambda{\|w\|}^2$
+    \item \textbf{Perspective of Probability} : 
+         \begin{itemize}
+             \item \textbf{expression} : $argmax_w P(w|X,y)$
+             \item \textbf{Posterior Probability} : $P(w|X,y) \sim P(y|X,w)P(w)$
+             \item \textbf{Likelyhood Probability} : $P(y|X,w)$ $\sim N(y|\mu, {\sigma_1}^{2})$
+             \item \textbf{Prior Probability} : $P(w) \sim N(w|0, {\sigma_2}^{2})$
+         \end{itemize}
+    \item \textbf{Properties} : 
+    \begin{itemize}
+        \item Convex Optimization.
+        \item This program has a global minimum at $\frac{\mathrm d}{\mathrm d x} \left( f(x) \right)=0$
+    \end{itemize}
+    \item \textbf{search method}
+    \begin{itemize}
+        \item[1.] $M = X^tX+\lambda I_n$이 가역행렬이라는 가정 하에, Optimal Solution을 직접 구할 수 있다.
+        \begin{itemize}
+            \item[--] $w^* = M^{-1}X^{t}y$
+        \end{itemize}
+        
+        \item[2.] Gradient Descent
+        \begin{itemize}
+            \item \textbf{gradient} : $-2X^t(y-Xw) + 2w$
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Implementation}
+        \begin{itemize}
+            \item[Method] : Optimal Solution과 Gradient Descent를 모두 구현하여, Optimal을 직접 찾을 수 없을 때, Approximate solution을 찾도록 설계했다.
+            \item[Algorithm] : 
+                \begin{itemize}
+                    \item[1.] If Optimal can be found directly, then $w_* = Optimal$
+                    \item[2.] Otherwise, Use ridge gradient to do gradient descent.
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Prediction}
+\begin{itemize}
+    \item[Algorithm] : Return $<weight, data>$ 
+\end{itemize}
+
+\subsection{LASSO Regression}
+\subsubsection{Definition}
+\begin{itemize}
+    \item[a] \textbf{L1 regularization} : 
+    \begin{itemize}
+        \item Definition : L1 norm($|x|$)을 이용한 제약
+        \item Expression : $argmin_w {f(x) +\lambda\sum_{i=1}^{n}{|w|}}$
+        \item Perspective of Probability :
+        \begin{itemize}
+            \item[1.] Weight에 대한 Laplace prior를 도입 ($P(w|0,b) \sim Laplace(w | 0,b)$)
+            \item[2.] \textbf{base1} : Weight에 대한 Posterior ($P(w|X,y) \sim P(y|X,w)P(w|0,b$)를 이용한다.
+            \item[3.] \textbf{expression} : $argmax_w P(w|X,y)$
+        \end{itemize}
+       
+    \end{itemize}
+    \item[b] \textbf{Lasso Regression} : 
+        \begin{itemize}
+            \item L1 Regularization을 통해, 학습 데이터에  과적합 되지 않도록 만든 Linear Regression
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Expression}
+\begin{itemize}
+    \item[1.] \textbf{expression} : $\boldsymbol{y = Xw+b}$
+    \item[2.] \textbf{loss function}: $L(w) = RSS(w) + \lambda\sum_{i=1}^{n}{|w|}$
+\end{itemize}
+
+\subsubsection{Properties}
+\begin{itemize}
+    \item [1.] Convex Optimization Program.
+    \item [2.] Degree of L1 regularization($\lambda$) $\propto$ Simplest of Model
+        \begin{itemize}
+            \item[a.] The hypothesis of weight can prevent model from over fitting about training data sets.
+            \item[b.] Too strong the hypothesis of weight can cause under fitting.
+        \end{itemize}
+    \item[3.] Feature Selection : $Weight = (w_1, \dots,w_n)$가 Laplace Distribution을 따른다는 가정이 Optimal Solution일 때, 특정 $w_j$가 0이 되도록 만든다.
+\end{itemize}
+
+\subsubsection{Optimization}
+\begin{itemize}
+    \item \textbf{goal} : Find $argmin_w RSS(w)+\lambda\sum_{i=1}^{n}{|w|}$
+    \item \textbf{Perspective of Probability} : 
+         \begin{itemize}
+             \item \textbf{expression} : $argmax_w P(w|X,y)$
+             \item \textbf{Posterior Probability} : $P(w|X,y) \sim P(y|X,w)P(w)$
+             \item \textbf{Likelyhood Probability} : $P(y|X,w)$ $\sim N(y|\mu, {\sigma}^{2})$
+             \item \textbf{Prior Probability} : $P(w) \sim Laplace(w|0, b)$
+         \end{itemize}
+    \item \textbf{Properties} : 
+    \begin{itemize}
+        \item Convex Optimization.
+        \item This program has a global minimum at $\frac{\mathrm d}{\mathrm d x} \left( f(x) \right)=0$
+    \end{itemize}
+    \item \textbf{search method}
+    \begin{itemize}
+        \item[1.] $L(w)$는 $w=0$에서 미분이 불가능하기 때문에 Optimal solution을 직접 찾을 수 없다.
+        \item[2.] Gradient Descent
+        \begin{itemize}
+            \item \textbf{gradient} : 
+                \begin{itemize}
+                    \item[a.] \textbf{RSS term} : $\frac{\mathrm d}{\mathrm d w} \left( RSS(w) \right)$
+                    \item[b.] \textbf{Constraint term} : $ \frac{\mathrm d}{\mathrm d w_j} \left(\lambda\sum_{i=1}^{n}{|w|} \right) = 
+                                                        \begin{cases}
+                                                            +\lambda       & \quad \text{if } w > 0\\
+                                                             0             &\quad \text{if } w = 0 (Sub derivative)\\
+                                                            -\lambda       &\quad \text{if } w < 0 \\
+                                                        \end{cases}
+                                                        $
+                    \item[c.] \textbf{gradient} : g $=$ RSS term + Constraint term
+                \end{itemize}
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Implementation} : Use ridge gradient to do gradient descent.
+\end{itemize}
+
+\subsubsection{Prediction}
+\begin{itemize}
+    \item[Algorithm] : Return $<weight, data>$
+\end{itemize}
+
+
+\subsection{Elastic Net Regression}
+\subsubsection{Definition}
+\begin{itemize}
+    \item[a] \textbf{Elastic Net Regression} : L1, L2 Regularization을 동시에 사용하여, Ridge와 LASSO의 장점을 섞은 Linear Regression
+\end{itemize}
+
+\subsubsection{Expression}
+\begin{itemize}
+    \item[1.] \textbf{expression} : $\boldsymbol{y = Xw+b}$
+    \item[2.] \textbf{loss function}: $L(w) = RSS(w) + {L2 ratio}*\lambda\|w\| + {L1 ratio}*\lambda\sum_{i=1}^{n}{|w|}$
+\end{itemize}
+
+\subsubsection{Properties}
+\begin{itemize}
+    \item [1.] Convex Optimization Program.
+    \item [2.] L1 and L2 regularization make model to be smooth.
+        \begin{itemize}
+            \item[a.] The hypothesis of weight can prevent model from over fitting about training data sets.
+            \item[b.] Too strong the hypothesis of weight can cause under fitting.
+        \end{itemize}
+    \item[3.] Weight Decay와 Feature Selection 특징을 동시에 갖고 있다. Ratio를 조절하여 어떤 특징을 우선할지 선택할 수 있다.
+\end{itemize}
+
+\subsubsection{Optimization}
+\begin{itemize}
+    \item \textbf{goal} : Find $argmin_w RSS(w)+\lambda\sum_{i=1}^{n}{|w|}$
+    \item \textbf{Perspective of Probability} : 
+         \begin{itemize}
+             \item \textbf{expression} : $argmax_w P(w|X,y)$
+             \item \textbf{Posterior Probability} : 
+                \begin{itemize}
+                    \item[Expression] : $P(w|X,y) \sim P(y|X,w)P(w|0,\sigma^2)P(y|X,w)P(w|0,b)$
+                    \item[Mean] : weight가 Gaussian Prior를 가짐과 동시에, Laplace Prior를 가진다.
+                \end{itemize}
+             
+             \item \textbf{Likelyhood Probability} : $P(y|X,w)$ $\sim N(y|\mu, {\sigma}^{2})$
+             \item \textbf{Prior Probability} : 
+                \begin{itemize}
+                    \item $p(w|0,\sigma^2) \sim N(w|0,\sigma^2)$
+                    \item $P(w|0,b) \sim Laplace(w|0, b)$
+                \end{itemize}
+         \end{itemize}
+    \item \textbf{Properties} : 
+    \begin{itemize}
+        \item Convex Optimization.
+        \item This program has a global minimum at $\frac{\mathrm d}{\mathrm d x} \left( f(x) \right)=0$
+    \end{itemize}
+    \item \textbf{search method}
+    \begin{itemize}
+        \item[1.] Laplace Prior를 가지기 때문에 Optimal solution을 직접 찾을 수 없다.
+        \item[2.] Gradient Descent
+        \begin{itemize}
+            \item \textbf{gradient} : 
+                \begin{itemize}
+                    \item[a.] \textbf{RSS term} : $\frac{\mathrm d}{\mathrm d w} \left( RSS(w) \right)$
+                    \item[b.] \textbf{Ridge term} : L2 ratio * $\lambda*2*w)$
+                    \item[c.] \textbf{Lasso term} : $ \frac{\mathrm d}{\mathrm d w_j} \left(\lambda\sum_{i=1}^{n}{|w|} \right) = 
+                                                        \begin{cases}
+                                                            +\lambda       & \quad \text{if } w > 0\\
+                                                             0             &\quad \text{if } w = 0 (Sub derivative)\\
+                                                            -\lambda       &\quad \text{if } w < 0 \\
+                                                        \end{cases}
+                                                        $
+                    \item[c.] \textbf{gradient} : g $=$ RSS term + 0.5*(Ridge term + Lasso term)
+                \end{itemize}
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Implementation} : Use an elastic net gradient to do gradient descent.
+\end{itemize}
+
+\subsubsection{Prediction}
+\begin{itemize}
+    \item[Algorithm] : Return $<weight, data>$
+\end{itemize}
+
+
+\subsection{K-Nearest-Neighbors Regression}
+\subsubsection{Definition}
+\begin{itemize}
+    \item Definition : A Regression that use the nearest n data of target to predict target value.
+\end{itemize}
+
+\subsubsection{Expression}
+\begin{itemize}
+    \item Expression : $y = \sum_{i=1}^{n}{P_i*y_i}$
+        \begin{itemize}
+            \item $P_i = \frac{K(x,x_i)}{S}$
+            \item $K(x_i,x) = \|x_i-x\|^2$
+            \item $S = \sum_{j=1}^{n}{K(x_j,x)}$
+        \end{itemize}
+    \item Perspective of Probability :
+    \begin{itemize}
+         \item[1.] $\forall{x\in {Neighbors}}$, Find the weight($P_i$) by using norm
+         \item[2.] $P_i$ is a probability since $\sum_{i=1}^{n}{P_i} = 1$
+         \item[3.] $y_{target} = $ weighted average of neighbor's labels
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Properties}
+\begin{itemize}
+    \item [1.] Non-Parameteric Model, Lazy Model
+    \item [2.] Whenever predicting target, KNN creates new model by using neighbors.
+    \item [3.] It can predict targets that have non-linear relation better than linear regression. 
+    \item[4.] 거리 측정 방식에 따라 정확도가 달라진다.
+            \begin{table}[h]
+                \centering
+                \begin{tabular}{c|c|c}
+                Norm    & r2-score \\ \hline
+                L1 norm & 0.41  \\ \hline 
+                L2 norm & 0.28\\
+                \end{tabular}
+                \caption{r2-score(neighbor = 2)}
+                \label{tab:my_label}
+            \end{table}    
+\end{itemize}
+
+
+\subsubsection{Optimization}
+\begin{itemize}
+    \item \textbf{goal} : Save training data in model.
+    \item \textbf{Properties} : 
+    \begin{itemize}
+        \item KNN Regression doesn't make parameters s.t weights.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Prediction}
+\begin{itemize}
+    \item[Algorithm] : 
+        \begin{itemize}
+            \item[1.] Calculate Distances between target and all train data.
+            \item[2.] Find n Neighbors.
+            \item[3.] Calculate $P_j = 1 - dist_j/\sum_{i=1}^{n}{dist_i}$
+            \item[4.] return $<P,label>$ where $P = (P_1,\dots,P_n)$
+        \end{itemize}
+\end{itemize}
+
+
+\subsection{Decision Tree Regression}
+\subsubsection{Definition}
+\begin{itemize}
+    \item[a] \textbf{Decision Tree} : edge를 결정하는 규칙과 결과를 tree structure로 표현한 것
+    \item[b] \textbf{Decision Tree Regression} : training data로 Decision Tree를 생성하여, target을 예측하는 Model
+\end{itemize}
+
+\subsubsection{Expression}
+\begin{itemize}
+    \item[1.] \textbf{expression} : $(x_1, x_2, \dots, x_n, Y)$
+    \item[2.] \textbf{loss function}: 
+\end{itemize}
+
+\subsubsection{Properties}
+\begin{itemize}
+    \item [1.] 예측 결과 분석이 쉽다.
+    \item [2.] 여러 종류의 features가 섞여 있어도, 어느정도 결과를 보장한다.
+    \item [3.] big data set에 좋다.
+\end{itemize}
+
+\subsubsection{Optimization}
+\begin{itemize}
+    \item \textbf{goal} : Find Optimal edges and leaf
+    \item \textbf{search method}
+        \begin{itemize}
+            \item[1.] : 매 분기마다 모든 변수를 고려하여 standard deviation이 작은 변수를 기준으로 분할한다.
+            \item[2.] : 매 분기마다 target과의 상관관계가 큰 순서대로 변수를 정하여 그것을 기준으로 분할한다.
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Implementation}
+\begin{itemize}
+    \item[1.] \textbf{Model} : 
+        \begin{itemize}
+            \item Recursion을 이용한 Decision Tree
+            \item DecisionTreeRegressor와 node class를 구현
+            \item DecisionTreeRegreesor 안에서 node의 recursion으로 tree를 fitting했다.
+        \end{itemize}
+    \item[1.] 노드 분할 기준
+        \begin{itemize}
+            \item[a] \textbf{The number of least leaf} : 4 ~ 30개 중, accurancy가 좋은 #개를 선택했다.
+            \item[b] \textbf{Criteria variable for edges dividing}
+                \begin{itemize}
+                    \item The data of our project is multivariate data. So we discussed how to dividing edges from the point of view depth and variable.
+                    \begin{itemize}
+                        \item[1.] \textbf{All possible conditions} : 각 node에서, 모든 변수를 고려하여 standard deviation이 작은 변수를 분할의 기준으로 삼는 방법이다. 좋은 Accuracy를 얻었으나, fitting time이 오래 걸리는 단점을 관측했다.
+                        
+                        \item[2.] \textbf{Correlation conditions} : target과의 상관관계가 큰 순서대로 기준을 정하는 방법이다. \textbf{1}보다 Accuracy는 감소했지만, fitting time이 급격히 줄어들었으며, 상관관계로 정렬하지 않은 것보단 Accuracy가 증가함을 관측했다. 
+                    \end{itemize}
+                \end{itemize}
+            \item[c] \textbf{Implementation for Regression} : To use decision tree for regression, $y_{predict}$ = mean of leaf $y_{train}$으로 구현했다.
+        \end{itemize}
+\end{itemize}
+
+
+
+\subsection{모델 비교}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Model & r2-score \\ \hline
+        Linear & 0.68 \\ 
+        Lasso(alpha = 1) & 0.66\\
+        ElasticNet(alpha = 1, L1_ratio = 0.5) & 0.60\\
+        DicisionTree(All possible conditions) & 0.54 \\
+        Ridge(alpha = 1) & 0.48\\
+        KNN(n = 2, L1 norm) & 0.41 \\
+        DicisionTree(Correlation conditions) & 0.28 \\
+        KNN(n = 2, L2 norm) & 0.28
+    \end{tabular}
+    \caption{r2-score(model)}
+    \label{tab:my_label}
+\end{table}
+
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|c|c}
+        Model & Degree 1 & Degree 2 \\ \hline
+        Linear & 0.68 & 0.76 \\ 
+        Lasso(alpha = 1) & 0.66 & 0.25\\
+        ElasticNet(alpha = 1, L1_ratio = 0.5) & 0.60 & 0.24\\
+        Ridge(alpha = 1) & 0.48 & 0.20\\
+    \end{tabular}
+    \caption{r2-score(poly + model)}
+    \label{tab:my_label}
+\end{table}
+
+
+
+\subsection{The Hard part of Implementation}
+
+\subsubsection{Gradient Descent}
+    \begin{itemize}
+        \item[] Overview : Optimal Solution을 찾지 못하거나, 심지어 INF value가 나오는 등 많은 문제가 있었다. 그래서 여러 번 알고리즘을 수정하여 Optimal Solution을 찾도록 만들었다.
+        
+        \item[] 시도 1 : 
+            \begin{itemize}
+                \item[1.] Update rule : w <= w - step * gradient
+                \item[2.] Result : Can't find an optimal solution.
+                \item[3.] Gain : 
+                    \begin{itemize}
+                        \item[a] Normalize의 중요성 : normalize를 하지 않았을 때, 1.0e-300 정도의 r2-score를 얻었고, normalize를 했을 때, 0.32 정도의 r2-score를 얻었다.
+                        
+                        \item[b] 해를 찾는 과정에서 종종 Overflow Error가 발생하는 것을 관측했다.
+                    \end{itemize}
+            \end{itemize}
+        \item[] 시도 2 : 
+            \begin{itemize}
+                \item[1.] Update rule : 
+                    \begin{itemize}
+                        \item 복수의 steps을 두어 여러 weight를 찾았다. $weights_{next}$
+                        \item $W_{next} = argmin_w{(gradient(weights_{next}))}$
+                    \end{itemize}
+                \item[2.] Result : Better than 1. But can't find an optimal solution.
+                \item[3.] Gain : 
+                    \begin{itemize}
+                        \item[a] step을 여러 개 설정하여 complexity을 조금 희새했지만 더 좋은 결과를 얻었다.
+                        
+                        \item[b] convergence 조건을 $\|g\|^2 = 0$로 하여 계산량을 줄였다.
+                    \end{itemize}
+            \end{itemize}
+        \item[] 시도 3 : Use Momentum Method  
+            \begin{itemize}
+                \item[1.] Update rule : 
+                    \begin{itemize}
+                        \item momentum method를 도입하여, 이전 update 결과를 반영했다.
+                        \item $W_{next} = argmin_w{(gradient(weights_{next} + gravity * {prv update}))}$
+                    \end{itemize}
+                \item[2.] Result : Better than 2. But can't find an optimal solution.
+                \item[3.] Gain : 
+                    \begin{itemize}
+                        \item[a] Unit Vector : update 방향 vector를 unit vector로 하자, overflow error가 사라졌다.
+                        \item[b] max iter를 올렸을 때, 정확도가 증가했지만, 너무 오래 걸리는 단점이 있었고, optimal solution을 찾을 수 없었다.
+                    \end{itemize}
+            \end{itemize}
+        
+        \item[] 시도 4 : Use Momentum Method  
+            \begin{itemize}
+                \item[1.] Update rule : 
+                    \begin{itemize}
+                        \item Multiple steps and gravities
+                        \item $W_{next} = argmin_w{(gradient(next_weights)}$
+                    \end{itemize}
+                \item[2.] Result : Find Optimal solutions.
+                \item[3.] Gain : 
+                    \begin{itemize}
+                        \item[a] 여러 스텝을 두어 Complexity가 증가했지만, Optimal Solution을 찾을 수 있었다.
+                        \item[b] max iter를 크게 두지 않아도 적절한 solution을 찾을 수 있었다.
+                    \end{itemize}
+            \end{itemize}
+    \end{itemize}
+\end{document}
