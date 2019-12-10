@@ -356,10 +356,10 @@
     \item \textbf{goal} : Find $argmin_w RSS(w)+\lambda\sum_{i=1}^{n}{|w|}$
     \item \textbf{Perspective of Probability} : 
          \begin{itemize}
-             \item \textbf{expression} : $argmax_w P(w|X,y)$
+             \item \textbf{expression} : $argmax_w P(w|X,y)^2$
              \item \textbf{Posterior Probability} : 
                 \begin{itemize}
-                    \item[Expression] : $P(w|X,y) \sim P(y|X,w)P(w|0,\sigma^2)P(y|X,w)P(w|0,b)$
+                    \item[Expression] : $P(w|X,y)^2 \sim {P(y|X,w)P(w|0,\sigma^2)}*{P(y|X,w)P(w|0,b)}$
                     \item[Mean] : weight가 Gaussian Prior를 가짐과 동시에, Laplace Prior를 가진다.
                 \end{itemize}
              
